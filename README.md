@@ -1,2 +1,2 @@
 # bootcamp-coders-academy
-Bootcamp utilizando Asp.Net Core e Angular
+:vulcan_salute: Bootcamp utilizando Asp.Net Core e Angular
