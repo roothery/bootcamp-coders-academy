@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 
 namespace CodersAcademy.API.Repository.Mapping
 {
-    public class AlbumMapping : IEntityTypeConfiguration<Album>
+    public class UserMapping : IEntityTypeConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<Album> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("Albuns");
+            builder.ToTable("User");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.Band).IsRequired().HasMaxLength(200);
+            builder.Property(x => x.Email).IsRequired().HasMaxLength(200);
             builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
-            builder.Property(x => x.Description).IsRequired().HasMaxLength(500);
-            builder.Property(x => x.Backdrop).IsRequired();
+            builder.Property(x => x.Password).IsRequired().HasMaxLength(200);
+            builder.Property(x => x.Photo).IsRequired().HasMaxLength(500);
 
-            builder.HasMany(x => x.Musics)
-                   .WithOne(x => x.Album)
+            builder.HasMany(x => x.FavoriteMusics)
+                   .WithOne(x => x.User)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
