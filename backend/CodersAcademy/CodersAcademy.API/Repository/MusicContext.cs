@@ -1,6 +1,7 @@
 ﻿using CodersAcademy.API.Model;
 using CodersAcademy.API.Repository.Mapping;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,14 @@ namespace CodersAcademy.API.Repository
             modelBuilder.ApplyConfiguration(new MusicMapping());
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            ILoggerFactory Logger = LoggerFactory.Create(x => x.AddConsole());
+            optionsBuilder.UseLoggerFactory(Logger);
+
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }
