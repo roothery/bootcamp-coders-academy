@@ -28,6 +28,30 @@ namespace CodersAcademy.API.Controllers
             AlbumRepository = albumRepository;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(Guid id)
+        {
+            var user = await this.UserRepository.GetUserAsync(id);
+
+            //Somente no C# 9 -> .NET 5
+            if (user is null)
+                return NotFound();
+
+            var result = this.Mapper.Map<UserResponse>(user);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUser()
+        {
+            var users = await this.UserRepository.GetAllAsync();
+
+            var result = this.Mapper.Map<List<UserResponse>>(users);
+
+            return Ok(result);
+        }
+
         [HttpPost("authenticate")]
         public async Task<IActionResult> SignIn([FromBody] SignInRequest request)
         {
@@ -41,9 +65,9 @@ namespace CodersAcademy.API.Controllers
             //Somente no C# 9 -> .NET 5
             if (user is null)
             {
-                return UnprocessableEntity(new
+                return Unauthorized(new
                 {
-                    Message = "Email/Senha inválios"
+                    Message = "Email/Senha inválidos"
                 });
             }
 
@@ -68,6 +92,64 @@ namespace CodersAcademy.API.Controllers
             var result = this.Mapper.Map<UserResponse>(user);
 
             return Created($"{result.Id}", result);
+        }
+
+        [HttpPost("{id}/favorite-music/{musicId}")]
+        public async Task<IActionResult> SaveUserFavoriteMusic(Guid id, Guid musicId)
+        {
+            var music = await this.AlbumRepository.GetMusicAsync(musicId);
+
+            var user = await this.UserRepository.GetUserAsync(id);
+
+            //Somente no C# 9 -> .NET 5
+            if (user is null)
+                return UnprocessableEntity(new { Message = "Usuário não encontrado" });
+
+            //Somente no C# 9 -> .NET 5
+            if (music is null)
+                return UnprocessableEntity(new { Message = "Música não encontrada" });
+
+            user.AddFavoriteMusic(music);
+
+            await this.UserRepository.UpdateAsync(user);
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}/favorite-music/{musicId}")]
+        public async Task<IActionResult> RemoveUserFavoriteMusic(Guid id, Guid musicId)
+        {
+            var music = await this.AlbumRepository.GetMusicAsync(musicId);
+
+            var user = await this.UserRepository.GetUserAsync(id);
+
+            //Somente no C# 9 -> .NET 5
+            if (user is null)
+                return UnprocessableEntity(new { Message = "Usuário não encontrado" });
+
+            //Somente no C# 9 -> .NET 5
+            if (music is null)
+                return UnprocessableEntity(new { Message = "Música não encontrada" });
+
+            user.RemoveFavoriteMusic(music);
+
+            await this.UserRepository.UpdateAsync(user);
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoveUser(Guid id)
+        {
+            var user = await this.UserRepository.GetUserAsync(id);
+
+            //Somente no C# 9 -> .NET 5
+            if (user is null)
+                return UnprocessableEntity(new { Message = "Usuário não encontrado" });
+
+            await this.UserRepository.RemoveAsync(user);
+
+            return NoContent();
         }
     }
 }
